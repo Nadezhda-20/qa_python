@@ -1,15 +1,11 @@
 import pytest
 from main import BooksCollector
 
-class TestBooksCollector:
-    @pytest.fixture
-    def collector(self):
-        return BooksCollector()
-
+class TestBooksCollector:    
+    
     def test_add_new_book_add_two_books(self,collector):    
         collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
-        # ИСПРАВЛЕНО: используем get_books_genre() вместо get_books_rating()
+        collector.add_new_book('Что делать, если ваш кот хочет вас убить')        
         assert len(collector.books_genre) == 2
 
     @pytest.mark.parametrize('name', ['', 'Очень длинное название книги, которое превышает лимит в 40 символов'])
@@ -48,10 +44,8 @@ class TestBooksCollector:
         collector.set_book_genre('Другая фантастика', 'Фантастика')
         
         fantasy_books = collector.get_books_with_specific_genre('Фантастика')
-        assert len(fantasy_books) == 2
-        assert 'Фантастическая книга' in fantasy_books
-        assert 'Другая фантастика' in fantasy_books
-        assert 'Детективная книга' not in fantasy_books
+        assert set(fantasy_books) == {'Фантастическая книга', 'Другая фантастика'}
+        
 
     def test_get_books_for_children(self,collector):
         
@@ -63,9 +57,8 @@ class TestBooksCollector:
         collector.set_book_genre('Комедия', 'Комедии')
         
         children_books = collector.get_books_for_children()
-        assert 'Мультфильм' in children_books
-        assert 'Комедия' in children_books
-        assert 'Ужас' not in children_books
+        assert set(children_books) == {'Мультфильм', 'Комедия'}
+        
 
     def test_add_book_in_favorites(self,collector):
         
@@ -85,11 +78,11 @@ class TestBooksCollector:
         collector.delete_book_from_favorites('Книга')
         assert 'Книга' not in collector.favorites
 
-    def test_get_books_genre_method(self, collector):
+    def test_get_books_genre_positive(self, collector):
         
         collector.add_new_book('Детектив')
-        collector.books_genre['Детектив'] = 'Детективы'
-        assert collector.get_books_genre('Детектив') == 'Детективы'
+        collector.set_book_genre('Детектив', 'Детективы')
+        assert collector.get_book_genre('Детектив') == 'Детективы'
 
     def test_get_book_genre_for_nonexistent_book(self, collector):
         assert collector.get_book_genre('Несуществующая книга') is None
